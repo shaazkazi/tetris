@@ -1,207 +1,162 @@
+:root {
+  --vh: 1vh;
+  --bg-dark: #0a0a1a;
+  --bg-gradient: linear-gradient(135deg, #0a0a1a 0%, #1a1a2e 100%);
+  --tetris-bg: rgba(20, 20, 35, 0.8);
+  --active-block: #00ff9d;
+  --fixed-block: #ff3e3e;
+  --control-bg: rgba(30, 30, 50, 0.9);
+}
 body {
   font-family: 'Roboto', sans-serif;
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-  color: #e9ecef;
+  background: var(--bg-gradient);
+  color: var(--text-color);
   text-align: center;
   margin: 0;
-  padding: 0;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
   flex-direction: column;
-  height: 100vh;
-  min-height: 100vh;
+  min-height: calc(var(--vh) * 100);
+  box-sizing: border-box;
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+  touch-action: none;
+}
+
+.game-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 500px;
+  height: 100%;
+  padding: 10px;
+  box-sizing: border-box;
 }
 
 h1 {
-  font-size: 2.5rem;
-  margin: 20px 0;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-  letter-spacing: 2px;
+  font-size: 1.8rem;
+  margin: 10px 0;
+  color: var(--active-block);
+  text-shadow: 0 0 10px rgba(0, 255, 157, 0.3);
+}
+
+#startGame {
+  background: linear-gradient(45deg, var(--active-block), #00cc7e);
+  color: var(--bg-dark);
+  border: none;
+  padding: 8px 20px;
+  border-radius: 20px;
+  font-weight: bold;
+  box-shadow: 0 0 15px rgba(0, 255, 157, 0.2);
 }
 
 .tetris-board {
   display: grid;
-  grid-template-columns: repeat(10, 30px);
-  grid-template-rows: repeat(20, 30px);
+  grid-template-columns: repeat(10, minmax(25px, 30px));
+  grid-template-rows: repeat(20, minmax(25px, 30px));
   gap: 1px;
-  margin: 20px auto;
+  background: var(--tetris-bg);
   border: 3px solid #2d4059;
-  background-color: rgba(45, 64, 89, 0.6);
-  box-shadow: 0 0 30px rgba(0, 0, 0, 0.3);
-  border-radius: 4px;
+  border-radius: 8px;
   padding: 3px;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+  margin: 10px auto;
 }
 
 .cell {
-  width: 30px;
-  height: 30px;
-  background-color: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.03);
   border-radius: 2px;
   transition: all 0.2s ease;
 }
 
 .cell.active {
-  background-color: #4caf50;
-  box-shadow: 0 0 10px #4caf50;
+  background: var(--active-block);
+  box-shadow: 0 0 15px var(--active-block);
 }
 
 .cell.fixed {
-  background-color: #ff5722;
-  box-shadow: 0 0 10px #ff5722;
-}
-
-button {
-  padding: 12px 24px;
-  font-size: 16px;
-  font-weight: 600;
-  color: #fff;
-  background: linear-gradient(45deg, #4a90e2, #357abd);
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(74, 144, 226, 0.3);
-}
-
-button:hover {
-  background: linear-gradient(45deg, #357abd, #2a609e);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(74, 144, 226, 0.4);
+  background: var(--fixed-block);
+  box-shadow: 0 0 15px var(--fixed-block);
 }
 
 #score {
-  margin-top: 15px;
   font-size: 1.4rem;
-  color: #ffd700;
-  text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
-  font-weight: bold;
+  color: var(--active-block);
+  text-shadow: 0 0 10px rgba(0, 255, 157, 0.3);
+  margin: 10px 0;
 }
 
 .mobile-controls {
-  display: none;
-  gap: 15px;
+  display: flex;
+  gap: 20px;
+  padding: 15px;
+  background: var(--control-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 25px;
   position: fixed;
-  bottom: 40px;
+  bottom: max(25px, env(safe-area-inset-bottom));
   left: 50%;
   transform: translateX(-50%);
-  padding: 15px;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  border-radius: 20px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
 .mobile-controls button {
-  width: 55px;
-  height: 55px;
-  font-size: 22px;
+  width: 60px;
+  height: 60px;
+  font-size: 24px;
   padding: 0;
+  border: none;
   border-radius: 50%;
-  background: linear-gradient(135deg, #4a90e2, #357abd);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  background: linear-gradient(135deg, var(--active-block), #00cc7e);
+  color: var(--bg-dark);
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 0 15px rgba(0, 255, 157, 0.2);
+  transition: transform 0.2s;
+}
+
+.mobile-controls button:active {
+  transform: scale(0.95);
+  background: linear-gradient(135deg, #00cc7e, #009960);
 }
 
 @media (max-width: 768px) {
-  .mobile-controls {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  
   .tetris-board {
-    transform: scale(0.85);
-    margin: 10px auto;
+    scale: 0.95;
   }
   
-  body {
-    padding: 10px 0 120px 0;
-    height: auto;
-  }
-
   h1 {
-    font-size: 2rem;
-    margin: 15px 0;
+    font-size: 1.5rem;
   }
 }
+html {
+  background: var(--bg-dark);
+}
+
 body {
   font-family: 'Roboto', sans-serif;
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-  color: #e9ecef;
+  background: var(--bg-gradient);
+  color: var(--text-color);
   text-align: center;
   margin: 0;
-  padding: 10px;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
   display: flex;
   justify-content: flex-start;
   align-items: center;
   flex-direction: column;
-  min-height: 100vh;
+  min-height: calc(var(--vh) * 100);
   box-sizing: border-box;
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+  touch-action: none;
 }
 
-h1 {
-  font-size: 1.5rem;
-  margin: 5px 0;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-  letter-spacing: 2px;
-}
-
-#startGame {
-  margin: 5px 0;
-  padding: 8px 16px;
-}
-
-.tetris-board {
-  display: grid;
-  grid-template-columns: repeat(10, 25px);
-  grid-template-rows: repeat(20, 25px);
-  gap: 1px;
-  margin: 10px auto;
-  border: 3px solid #2d4059;
-  background-color: rgba(45, 64, 89, 0.6);
-  box-shadow: 0 0 30px rgba(0, 0, 0, 0.3);
-  border-radius: 4px;
-  padding: 2px;
-}
-
-.cell {
-  width: 25px;
-  height: 25px;
-}
-
-#score {
-  margin: 5px 0;
-  font-size: 1.2rem;
-}
-
-.mobile-controls {
-  position: relative;
-  bottom: 0;
-  padding: 10px;
-  margin-top: 10px;
-}
-
-.mobile-controls button {
-  width: 45px;
-  height: 45px;
-  font-size: 20px;
-}
-
-@media (max-width: 768px) {
-  body {
-    padding: 5px 5px 15px 5px;
-    justify-content: space-between;
-  }
-
-  .tetris-board {
-    transform: none;
-    margin: 5px auto;
-  }
-
-  .mobile-controls {
-    margin-top: 5px;
-  }
-}
