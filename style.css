@@ -1,0 +1,129 @@
+body {
+  font-family: 'Roboto', sans-serif;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  color: #e9ecef;
+  text-align: center;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  height: 100vh;
+  min-height: 100vh;
+}
+
+h1 {
+  font-size: 2.5rem;
+  margin: 20px 0;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  letter-spacing: 2px;
+}
+
+.tetris-board {
+  display: grid;
+  grid-template-columns: repeat(10, 30px);
+  grid-template-rows: repeat(20, 30px);
+  gap: 1px;
+  margin: 20px auto;
+  border: 3px solid #2d4059;
+  background-color: rgba(45, 64, 89, 0.6);
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+  padding: 3px;
+}
+
+.cell {
+  width: 30px;
+  height: 30px;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 2px;
+  transition: all 0.2s ease;
+}
+
+.cell.active {
+  background-color: #4caf50;
+  box-shadow: 0 0 10px #4caf50;
+}
+
+.cell.fixed {
+  background-color: #ff5722;
+  box-shadow: 0 0 10px #ff5722;
+}
+
+button {
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+  background: linear-gradient(45deg, #4a90e2, #357abd);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(74, 144, 226, 0.3);
+}
+
+button:hover {
+  background: linear-gradient(45deg, #357abd, #2a609e);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(74, 144, 226, 0.4);
+}
+
+#score {
+  margin-top: 15px;
+  font-size: 1.4rem;
+  color: #ffd700;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+  font-weight: bold;
+}
+
+.mobile-controls {
+  display: none;
+  gap: 15px;
+  position: fixed;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 15px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.mobile-controls button {
+  width: 55px;
+  height: 55px;
+  font-size: 22px;
+  padding: 0;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #4a90e2, #357abd);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (max-width: 768px) {
+  .mobile-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .tetris-board {
+    transform: scale(0.85);
+    margin: 10px auto;
+  }
+  
+  body {
+    padding: 10px 0 120px 0;
+    height: auto;
+  }
+
+  h1 {
+    font-size: 2rem;
+    margin: 15px 0;
+  }
+}

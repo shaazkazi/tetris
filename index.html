@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tetris Game</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>Tetris Game</h1>
+  <button id="startGame">Start Game</button>
+  <div class="tetris-board"></div>
+  <div id="score">Score: 0</div>
+  
+  <div class="mobile-controls">
+    <button id="leftBtn">←</button>
+    <button id="rotateBtn">↻</button>
+    <button id="rightBtn">→</button>
+    <button id="downBtn">↓</button>
+  </div>
+
+  <script>
+    const board = document.querySelector('.tetris-board');
+    const scoreDisplay = document.getElementById('score');
+    const startButton = document.getElementById('startGame');
+
+    const rows = 20;
+    const cols = 10;
+    let grid = [];
+    let score = 0;
+    let gameInterval;
+    let activeTetromino;
+    let activePosition;
+
+    // Define tetromino shapes
+    const tetrominoes = [
+      [[1, 1, 1, 1]], // I
+      [
+        [1, 1],
+        [1, 1]
+      ], // O
+      [
+        [0, 1, 0],
+        [1, 1, 1]
+      ], // T
+      [
+        [1, 0, 0],
+        [1, 1, 1]
+      ], // L
+      [
+        [0, 0, 1],
+        [1, 1, 1]
+      ] // J
+    ];
+
+    // Initialize the game board
+    function createBoard() {
+      board.innerHTML = '';
+      grid = Array.from({ length: rows }, () => Array(cols).fill(0));
+      grid.forEach(row => {
+        row.forEach(() => {
+          const cell = document.createElement('div');
+          cell.classList.add('cell');
+          board.appendChild(cell);
+        });
+      });
+    }
+
+    function drawBoard() {
+      const cells = document.querySelectorAll('.cell');
+      cells.forEach((cell, index) => {
+        const x = index % cols;
+        const y = Math.floor(index / cols);
+        cell.className = 'cell';
+        if (grid[y][x] === 1) cell.classList.add('fixed');
+        if (grid[y][x] === 2) cell.classList.add('active');
+      });
+    }
+
+    // Spawn a new tetromino
+    function spawnTetromino() {
+      const shape = tetrominoes[Math.floor(Math.random() * tetrominoes.length)];
+      activeTetromino = shape;
+      activePosition = { x: Math.floor(cols / 2) - 1, y: 0 };
+
+      if (isCollision(activePosition.x, activePosition.y)) {
+        clearInterval(gameInterval);
+        alert('Game Over! Your score: ' + score);
+      }
+    }
+
+    function drawTetromino() {
+      activeTetromino.forEach((row, y) => {
+        row.forEach((cell, x) => {
+          if (cell) {
+            grid[activePosition.y + y][activePosition.x + x] = 2;
+          }
+        });
+      });
+    }
+
+    function clearTetromino() {
+      activeTetromino.forEach((row, y) => {
+        row.forEach((cell, x) => {
+          if (cell) {
+            grid[activePosition.y + y][activePosition.x + x] = 0;
+          }
+        });
+      });
+    }
+
+    // Check for collision
+    function isCollision(newX, newY) {
+      return activeTetromino.some((row, y) =>
+        row.some((cell, x) => {
+          if (cell) {
+            const boardX = newX + x;
+            const boardY = newY + y;
+            return (
+              boardY >= rows ||
+              boardX < 0 ||
+              boardX >= cols ||
+              grid[boardY][boardX] === 1
+            );
+          }
+          return false;
+        })
+      );
+    }
+
+    // Move tetromino
+    function moveTetromino(dx, dy) {
+      clearTetromino();
+      const newX = activePosition.x + dx;
+      const newY = activePosition.y + dy;
+
+      if (!isCollision(newX, newY)) {
+        activePosition.x = newX;
+        activePosition.y = newY;
+      } else if (dy > 0) {
+        fixTetromino();
+        clearRows();
+        spawnTetromino();
+      }
+
+      drawTetromino();
+      drawBoard();
+    }
+
+    // Fix tetromino to the grid
+    function fixTetromino() {
+      activeTetromino.forEach((row, y) => {
+        row.forEach((cell, x) => {
+          if (cell) {
+            grid[activePosition.y + y][activePosition.x + x] = 1;
+          }
+        });
+      });
+    }
+
+    // Clear full rows
+    function clearRows() {
+      grid = grid.filter(row => row.some(cell => cell === 0));
+      const rowsCleared = rows - grid.length;
+      for (let i = 0; i < rowsCleared; i++) {
+        grid.unshift(Array(cols).fill(0));
+      }
+      score += rowsCleared * 100;
+      scoreDisplay.textContent = 'Score: ' + score;
+    }
+
+    // Start the game
+    function startGame() {
+      createBoard();
+      score = 0;
+      scoreDisplay.textContent = 'Score: 0';
+      spawnTetromino();
+      drawBoard();
+
+      gameInterval = setInterval(() => moveTetromino(0, 1), 500);
+    }
+
+    // Rotate tetromino
+    function rotateTetromino() {
+      clearTetromino();
+      const rotated = activeTetromino[0].map((_, index) =>
+        activeTetromino.map(row => row[index]).reverse()
+      );
+
+      // Check if the rotated tetromino collides with the grid
+      const newX = activePosition.x;
+      const newY = activePosition.y;
+
+      if (!rotated.some((row, y) =>
+        row.some((cell, x) => {
+          if (cell) {
+            const boardX = newX + x;
+            const boardY = newY + y;
+            return (
+              boardY >= rows ||
+              boardX < 0 ||
+              boardX >= cols ||
+              grid[boardY][boardX] === 1
+            );
+          }
+          return false;
+        })
+      )) {
+        // Update active tetromino if rotation is valid
+        activeTetromino = rotated;
+      }
+
+      drawTetromino();
+      drawBoard();
+    }
+    // Add this before the existing event listeners
+
+// Prevent default touch behaviors
+document.addEventListener('touchmove', (e) => e.preventDefault(), { passive: false });
+document.addEventListener('gesturestart', (e) => e.preventDefault());
+document.addEventListener('gesturechange', (e) => e.preventDefault());
+document.addEventListener('gestureend', (e) => e.preventDefault());
+
+// Mobile controls
+const leftBtn = document.getElementById('leftBtn');
+const rightBtn = document.getElementById('rightBtn');
+const downBtn = document.getElementById('downBtn');
+const rotateBtn = document.getElementById('rotateBtn');
+
+// Touch event handlers
+leftBtn.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    moveTetromino(-1, 0);
+});
+
+rightBtn.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    moveTetromino(1, 0);
+});
+
+downBtn.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    moveTetromino(0, 1);
+});
+
+rotateBtn.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    rotateTetromino();
+});
+
+// Add continuous movement while holding buttons
+['leftBtn', 'rightBtn', 'downBtn'].forEach(btnId => {
+    let intervalId;
+    const btn = document.getElementById(btnId);
+    
+    btn.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        if (intervalId) clearInterval(intervalId);
+        
+        const action = {
+            'leftBtn': () => moveTetromino(-1, 0),
+            'rightBtn': () => moveTetromino(1, 0),
+            'downBtn': () => moveTetromino(0, 1)
+        }[btnId];
+        
+        action();
+        intervalId = setInterval(action, 150);
+    });
+    
+    btn.addEventListener('touchend', () => {
+        if (intervalId) clearInterval(intervalId);
+    });
+});
+
+
+    // Updated control for the tetromino
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'ArrowLeft') moveTetromino(-1, 0);
+      if (event.key === 'ArrowRight') moveTetromino(1, 0);
+      if (event.key === 'ArrowDown') moveTetromino(0, 1);
+      if (event.key === 'ArrowUp' || event.key === ' ') {
+        event.preventDefault(); // Prevent space bar default behavior
+        rotateTetromino();
+      }
+    });
+
+    startButton.addEventListener('click', startGame);
+  </script>
+  <!-- Add this right before the closing </body> tag -->
+</script>
+</body>
+</html>
